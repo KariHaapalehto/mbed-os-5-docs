@@ -1,4 +1,4 @@
-## Software Design
+# Software Design
 
 Principles of Arm Mbed software:
 
@@ -7,11 +7,11 @@ Principles of Arm Mbed software:
 - Simple.
 - Reliable.
 
-### Style
+## Style
 
 Please refer to the [Mbed style guide](../contributing/style.html).
 
-### Organization
+## Organization
 
 The Arm Mbed OS codebase is organized into conceptual submodules to limit the scope and complexity of individual contributions. These modules are contained in the Mbed OS codebase as a single Git repo. We suggest this model for external libraries.
 
@@ -30,11 +30,12 @@ The Arm Mbed OS codebase is organized into conceptual submodules to limit the sc
 - As an entry point for the module (from the user space), we suggest a single header file. For example: `mbed.h`, `rtos.h`.
 - Header files should limit external includes to avoid indirectly exposing unrelated APIs. Header files should not expand namespaces.
 - In C++ modules, the API should be contained in a namespace that matches the module’s name. For example: `mbed::Ticker`, `rtos::Thread`, `netsocket::Socket`.
+- Define the internal class types in each C++ module inside an anonymous namespace. In C++, you cannot have different definitions of the same class name in different source files, even if they are not externally visible. In practice, a name collision often doesn't cause a problem; however, it can cause a build failure when link time optimization (LTO) is enabled, or a runtime failure if templates are instantiated using the internal classes. 
 - In C modules, every nonstatic function and type should be prefixed with the module’s name followed by an underscore. For example: `mbed_critical_section_enter()`, `lwip_gethostbyname(host)`.
 - A module contained in the Mbed OS codebase may be mirrored in a separate repo. The source repo should be clearly identified and linked to from the module's README.
 - Special directories should follow consistent naming convention.
 
-### Contribution
+## Contribution
 1. Please refer to the [Mbed contribution guide](../contributing/index.html).
 1. Each pull request should serve a single purpose.
 1. The code must compile every commit.
@@ -54,11 +55,11 @@ The Arm Mbed OS codebase is organized into conceptual submodules to limit the sc
     - Apache.
     - Permissive Binary License.
 
-### API design
+## API design
 
 A general module can be split into two APIs, the frontend (or user API) and the backend (or porting layer). The user API describes the programmer interface that the library implements. For Mbed OS, the user-facing API should adopt a C++ class-based interface, while the porting layer should adopt a C-compatible interface.
 
-#### API design - user API
+### API design - user API
 
 - Each module should provide an object-oriented C++ user API.
 - The current standard is strictly C++03 (for portability).
@@ -109,7 +110,7 @@ A general module can be split into two APIs, the frontend (or user API) and the 
     - Code that is functionally incorrect.
     - Code that is not safe (synchronization) or that results in undefined behavior.
 
-#### API design - porting layer
+### API design - porting layer
 
 - Each module should provide a C-compatible porting layer.
 - The current standards are strictly C99 (for portability).
@@ -118,7 +119,7 @@ A general module can be split into two APIs, the frontend (or user API) and the 
 - The porting layer should be designed to allow as much variance in the implementation as is reasonable.
 - Simplicity is beautiful.
 
-#### Thread and IRQ safety
+### Thread and IRQ safety
 
 - User APIs should be thread safe.
 - If a user API is intended to be interrupt safe, this should be clearly documented.
@@ -128,7 +129,7 @@ A general module can be split into two APIs, the frontend (or user API) and the 
 - If a callback is called in interrupt context, the API responsible should be clearly documented with a warning.
 	Use a consistent form across all APIs: **"warning: called from interrupt context"**
 
-### Documentation
+## Documentation
 
 - Each function and class in a module should provide a doxygen comment that documents the function and each argument and return value:
 
@@ -152,7 +153,7 @@ A general module can be split into two APIs, the frontend (or user API) and the 
     - If a module contains tests, the README should provide testing instruction.
 - Extended documentation should be located in the module’s `docs` directory with appropriate links from the module’s README.
 
-### Testing
+## Testing
 
 - Each module should contain a `tests` directory with tests that cover the module’s functionality.
 - Tests should be organized based on the class being tested; roughly one test file per class.
@@ -161,7 +162,7 @@ A general module can be split into two APIs, the frontend (or user API) and the 
 
 [Full documentation](../tools/test-and-debug.html).
 
-### Configuration
+## Configuration
 
 Mbed OS provides a powerful configuration system for application development. However, modules should also be concerned with remaining configurable outside of the Mbed build system. Modules should provide well-documented configuration options in a simple header file.
 
@@ -175,7 +176,7 @@ Mbed OS provides a powerful configuration system for application development. Ho
 
 [Full documentation](../reference/configuration.html).
 
-### Design process and template
+## Design process and template
 
 If you are designing a new feature or software module for Mbed OS, you must follow the design process and guidelines that the [design process for Mbed OS](https://github.com/ARMmbed/mbed-os/blob/master/docs/design-documents/README.md) describes.
 

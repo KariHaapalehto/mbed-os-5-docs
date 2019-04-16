@@ -1,4 +1,4 @@
-## Device Management configuration
+# Device Management configuration
 
 Device Management configuration has five distinct areas:
 
@@ -14,13 +14,13 @@ For full documentation about bootloaders and firmware update, please read the fo
 
 - [Introduction to Mbed OS bootloaders](../porting/bootloader.html).
 - [Creating and using an Mbed OS bootloader](../tutorials/bootloader.html).
-- [Bootloader configuration in Mbed OS](../tools/configuring-tools.html).
-- [Mbed Bootloader for Device Management](https://github.com/ARMmbed/mbed-bootloader).
+- [Bootloader configuration in Mbed OS](../reference/bootloader-configuration.html).
+- [Mbed Bootloader for Device Management](https://github.com/ARMmbed/mbed-bootloader), or the short introduction [in the Device Management documentation](https://cloud.mbed.com/docs/current/updating-firmware/bootloaders.html).
 - [Updating devices with Mbed CLI](../tools/cli-update.html).
 
 To hasten this process, you can copy the configuration from the [application example](https://github.com/ARMmbed/pelion-ready-example/blob/master/mbed_app.json) as the basis for your application configuration.
 
-### 1. Application configuration
+## 1. Application configuration
 
 Edit the `mbed_app.json` file, and create a new entry under `target_overrides` with the target name for your device:
 
@@ -61,11 +61,11 @@ Edit the `mbed_app.json` file, and create a new entry under `target_overrides` w
 - **SOTP** - Define two SOTP or NVStore regions that Device Management will use to store its special keys, which encrypt the data stored. Use the last two Flash sectors (if possible) to ensure that they don't get overwritten when new firmware is applied. For example:
 
    ```
-            "device_management.sotp-section-1-address"            : "(MBED_CONF_APP_FLASH_START_ADDRESS + MBED_CONF_APP_FLASH_SIZE - 2*(128*1024))",
-            "device_management.sotp-section-1-size"               : "(128*1024)",
-            "device_management.sotp-section-2-address"            : "(MBED_CONF_APP_FLASH_START_ADDRESS + MBED_CONF_APP_FLASH_SIZE - 1*(128*1024))",
-            "device_management.sotp-section-2-size"               : "(128*1024)",
-            "device_management.sotp-num-sections" : 2
+            "device-management.sotp-section-1-address"            : "(MBED_CONF_APP_FLASH_START_ADDRESS + MBED_CONF_APP_FLASH_SIZE - 2*(128*1024))",
+            "device-management.sotp-section-1-size"               : "(128*1024)",
+            "device-management.sotp-section-2-address"            : "(MBED_CONF_APP_FLASH_START_ADDRESS + MBED_CONF_APP_FLASH_SIZE - 1*(128*1024))",
+            "device-management.sotp-section-2-size"               : "(128*1024)",
+            "device-management.sotp-num-sections" : 2
    ```
 
 `*-address` defines the start of the Flash sector, and `*-size` defines the actual sector size. `sotp-num-sections` should always be set to `2`.
@@ -84,7 +84,7 @@ To run the tests:
 $ mbed test -t <TOOLCHAIN> -m <BOARD> -n simple*dev*connect --run -v
 ```
 
-### 2. Bootloader configuration
+## 2. Bootloader configuration
 
 After you've successfully passed the "Connect" tests as described above, you can enable firmware update feature by adding a bootloader to your application.
 
@@ -134,7 +134,7 @@ After you've successfully passed the "Connect" tests as described above, you can
 <span class="notes">**Note:** `mbed-bootloader` is primarily optimized for `GCC_ARM`, so you may want to compile it with that toolchain.
 Before jumping to the next step, you should compile and flash the bootloader and then connect over the virtual comport to ensure the bootloader is running correctly. You can ignore errors related to checksum verification or failure to jump to application - these are expected at this stage.</span>
 
-### 3. Add the bootloader to your application
+## 3. Add the bootloader to your application
 
 1. Copy the compiled bootloader from `mbed-bootloader-extended/BUILDS/<TARGET>/<TOOLCHAIN>-TINY/mbed-bootloader.bin` to `<your_application_name>/bootloader/mbed-bootloader-<TARGET>.bin`.
 
@@ -148,12 +148,13 @@ Before jumping to the next step, you should compile and flash the bootloader and
             "update-client.application-details": "(MBED_CONF_APP_FLASH_START_ADDRESS + 64*1024)",
    ```
 
-   <span class="notes">**Note:**    
+   **Note:**    
+
       - `update-client.application-details` should be identical in both `bootloader_app.json` and `mbed_app.json`.
       - `target.app_offset` is relative offset to `flash-start-address` you specified in `mbed_app.json` and `bootloader_app.json`, and is the hex value of the offset specified by `application-start-address` in `bootloader_app.json`. For example,  `(MBED_CONF_APP_FLASH_START_ADDRESS+65*1024)` dec equals `0x10400` hex.
-      - `target.header_offset` is also relative offset to the `flash-start-address` you specified in the `bootloader_app.json`, and is the hex value of the offset specified by `update-client.application-details`. For example, `(MBED_CONF_APP_FLASH_START_ADDRESS+64*1024)` dec equals `0x10000` hex.</span>
+      - `target.header_offset` is also relative offset to the `flash-start-address` you specified in the `bootloader_app.json`, and is the hex value of the offset specified by `update-client.application-details`. For example, `(MBED_CONF_APP_FLASH_START_ADDRESS+64*1024)` dec equals `0x10000` hex.
 
-1. Finally, compile and rerun all tests, including the firmware update ones with:
+1. Compile and rerun all tests, including the firmware update ones with:
 
    ```
    $ mbed test -t <TOOLCHAIN> -m <BOARD> -n simple*dev*connect -DMBED_TEST_MODE --compile

@@ -1,18 +1,27 @@
-<h2 id="device-management">Device Management for Mbed OS</h2>
+<h1 id="device-management">Device Management for Mbed OS</h1>
 
-This feature provides a way to add device management capabilities to Mbed OS devices using the Pelion Device Management service.
+Pelion Client is an abstraction of the Device Management Client, and lets Mbed OS devices use the [Pelion Device Management Services](https://cloud.mbed.com/docs/latest/welcome/index.html). Pelion Client:
 
-It:
-
-- Enables applications to connect and perform firmware updates in a few lines of code.
+- Provides LwM2M resources - variables that sync automatically through Device Management. Pelion Client makes it trivial to expose sensors, actuators and other variables to a cloud service.
+- Supports firmware updates with just a few lines of code.
 - Runs separately from your main application; it does not take over your main loop.
-- Provides LWM2M resources, variables that sync automatically through Device Management.
-- Helps users avoid doing blocking network operations in interrupt contexts, by automatically deferring actions to a separate thread.
+- Helps avoid blocking network operations in interrupt contexts, by automatically deferring actions to a separate thread.
 - Provides end-to-end Greentea tests for Device Management.
 
-This library makes it trivial to expose sensors, actuators and other variables to a cloud service. For a complete Device Management Client API, please see our [documentation](https://cloud.mbed.com/docs/current/client-api-references/index.html).
+This guide builds on the [quick connect guide](https://os.mbed.com/guides/connect-device-to-pelion/), which creates a cloud-connected application for supported Mbed OS boards. The guide covers:
 
-### Device Management for your Mbed OS application
+- [Hardware requirements](#requirements).
+- [Adding the library to an application](#adding-device-management-connectivity-to-your-application).
+- A list of [example applications for different boards](#example-applications).
+- [Configuring the application and bootloader](../mbed-os-pelion/device-management-configuration.html).
+- [Validation and testing](../mbed-os-pelion/device-management-test.html).
+- [Troubleshooting](../mbed-os-pelion/device-management-test.html#troubleshooting).
+
+<span class="tips">**Tip**: To learn more about Device Management Client, please see our [Device Management documentation](https://cloud.mbed.com/docs/latest/client-api-references/index.html).</span>
+
+## Device Management for your Mbed OS application
+
+### Requirements
 
 Not every device (microcontroller, module or board) is capable of running device management features. Although you can add or extend some hardware capabilities, such as connectivity, storage and TRNG, others are impossible or inconvenient to extend (for example, RAM or flash).
 
@@ -31,11 +40,13 @@ Useful references:
 
 - Check which Mbed OS platforms are supported in the [Device Management quick start guide](https://cloud.mbed.com/quick-start).
 - Check the [storage options available](../reference/storage.html).
-- Check the [network options available](../reference/network-socket.html).
+- Check the [network options available](../reference/networking.html).
 
-#### Adding a device management feature to your application
+### Adding Device Management connectivity to your application
 
-1. Add this library to your Mbed OS project:
+1. Add Pelion Client to your Mbed OS project:
+
+    <span class="notes">**Note**: the library is called `simple-mbed-cloud-client`.</span>
 
    ```
    $ mbed add https://github.com/ARMmbed/simple-mbed-cloud-client
@@ -43,7 +54,9 @@ Useful references:
 
    If you do not have an Mbed OS project to add, you can create one with `mbed new <your_application_name>` and then the `mbed add` step above.
 
-1. Reference the library from the `main.cpp` file, and add network and storage drivers. Finally, initialize the SimpleMbedCloudClient library. This is the architecture of a device management application with Mbed OS:
+1. Reference the library from the `main.cpp` file, and add network and storage drivers.
+
+1. Initialize the `simple-mbed-cloud-client` library:
 
     ```cpp NOCI
     #include "simple-mbed-cloud-client.h"
@@ -74,13 +87,13 @@ Useful references:
     }
     ```
 
-1. Configure the API key for your Device Management account.
-
-   If you don't have an API key available, then log in to [Device Management Portal](https://portal.mbedcloud.com/), navigate to `Access Management` and `API keys`, and create a new one. Then specify the API key as the global `mbed` configuration:
+1. Configure the API key for your Device Management account by specifying the API key as the global `mbed` configuration:
 
     ```
     $ mbed config -G CLOUD_SDK_API_KEY <your-api-key>
     ```
+
+    <span class="tips">If you don't have an API key available, then log in to [Device Management Portal](https://portal.mbedcloud.com/), navigate to `Access Management` and `API keys`, and create a new one.</span>
 
 1. Install the Device Management certificate:
 
@@ -90,7 +103,7 @@ Useful references:
 
 This creates your private and public key pair and also initialize various `.c` files with these credentials, so you can use Connect and (firmware) Update device management features.
 
-#### Example applications
+### Example applications
 
 To help you start quickly, please refer to the following [application example](https://github.com/ARMmbed/pelion-ready-example). It demonstrates how to connect to the Device Management service, register resources and get ready to receive a firmware update.
 
